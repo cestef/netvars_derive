@@ -6,7 +6,7 @@ use syn;
 pub fn hasnetvar_derive(tokens: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(tokens as syn::DeriveInput);
     let mut output = TokenStream::default();
-    if let syn::Data::Struct(struct_data) = input.data {
+    if let syn::Data::Struct(_) = input.data {
         let syn::DeriveInput {
             ident, generics, ..
         } = input;
@@ -90,7 +90,6 @@ impl syn::parse::Parse for NetvarData {
 
 #[proc_macro_attribute]
 pub fn netvar(attr: TokenStream, item: TokenStream) -> TokenStream {
-    use syn::parse::{Parse, ParseStream};
 
     let NetvarData { table, netvar } = syn::parse_macro_input!(attr as NetvarData);
 
@@ -103,7 +102,7 @@ pub fn netvar(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let ret_ty = match fn_ast.sig.output {
         syn::ReturnType::Type(_, ty) => *ty,
-        syn::ReturnType::Default => syn::parse(syn::export::From::from(quote! { () })).unwrap(),
+        syn::ReturnType::Default => syn::parse(quote! { () }.into()).unwrap(),
     };
 
     let output = quote! {
@@ -117,7 +116,6 @@ pub fn netvar(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 pub fn offset_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    use syn::parse::{Parse, ParseStream};
 
     let path = syn::parse_macro_input!(attr as syn::ExprPath);
 
